@@ -1,0 +1,95 @@
+.order-form-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+.order-form-card {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 20px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.light-mode {
+  background-color: #f7f7f7;
+  color: #000;
+}
+
+.light-mode .order-form-card {
+  background-color: #ffffff;
+  color: #000;
+}
+
+.dark-mode {
+  background-color: #121212;
+  color: #fff;
+}
+
+.dark-mode .order-form-card {
+  background-color: #333;
+  color: #fff;
+}
+
+.order-history {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.order-history table {
+  width: 100%;
+  max-width: 800px;
+  border-collapse: collapse;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.order-history table th,
+.order-history table td {
+  padding: 12px 15px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.order-history table th {
+  background-color: #f1f1f1;
+  font-weight: bold;
+}
+
+.order-history table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.order-history table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.order-history table td {
+  color: #000;
+}
+
+.dark-mode .order-history table th {
+  background-color: #333;
+  color: #fff;
+}
+
+.dark-mode .order-history table td {
+  color: #fff;
+}
+
+.dark-mode .order-history table tr:nth-child(even) {
+  background-color: #444;
+}
+
+.dark-mode .order-history table tr:hover {
+  background-color: #555;
+}

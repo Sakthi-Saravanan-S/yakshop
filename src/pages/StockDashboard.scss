@@ -1,0 +1,36 @@
+.stock-dashboard-container {
+  padding: 20px;
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+
+  &.dark {
+    background-color: #333;
+    color: white;
+  }
+}
+
+.MuiFormControl-root {
+  font-size: 14px;
+}
+
+.MuiSelect-root {
+  font-size: 14px;
+}
+
+.MuiButton-root {
+  font-size: 14px;
+  padding: 10px 20px;
+}
+
+.MuiTypography-root {
+  font-size: 16px;
+}
+
+@media (max-width: 600px) {
+  .stock-dashboard-container {
+    padding: 10px;
+  }
+  .MuiFormControl-root,
+  .MuiButton-root {
+    max-width: 100%;
+  }
+}

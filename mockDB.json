@@ -1,0 +1,37 @@
+{
+  "herd": [
+    {
+      "id": "1",
+      "name": "Betty-1",
+      "age": 4,
+      "sex": "f",
+      "lastShavedDay": 10
+    },
+    {
+      "id": "2",
+      "name": "Betty-2",
+      "age": 8,
+      "sex": "f",
+      "lastShavedDay": 40
+    },
+    {
+      "id": "3",
+      "name": "Betty-3",
+      "age": 9.5,
+      "sex": "f",
+      "lastShavedDay": 95
+    }
+  ],
+  "stock": {
+    "milk": 120,
+    "wool": 45
+  },
+  "orders": [
+    {
+      "id": "9099",
+      "milk": 10,
+      "wool": 20,
+      "date": "2025-01-16T14:30:21.980Z"
+    }
+  ]
+}
