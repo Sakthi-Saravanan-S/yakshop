@@ -21,13 +21,16 @@ export const fetchStock = async () => {
   }
 };
 
-export const placeOrder = async (milk, wool, date, id) => {
+export const placeOrder = async (milk, wool, date, id, milkCost, woolCost, totalCost) => {
   try {
     const response = await axios.post(`${API_URL}/orders`, {
       milk,
       wool,
       date,
       id,
+      milkCost,
+      woolCost,
+      totalCost,
       orderStatus: 'completed',
     });
 

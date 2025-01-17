@@ -37,45 +37,73 @@
   },
   "orders": [
     {
-      "id": 133132,
-      "milk": 10,
-      "wool": 20,
-      "date": "2025-01-17T05:04:06.203Z",
+      "id": 654566,
+      "milk": 5,
+      "wool": 1,
+      "date": "2025-01-14T11:13:45.279Z",
+      "milkCost": 150,
+      "woolCost": 500,
+      "totalCost": 650,
       "orderStatus": "completed"
     },
     {
-      "id": 265556,
+      "id": 321321,
+      "milk": 2,
+      "wool": 2,
+      "date": "2025-01-14T11:14:09.498Z",
+      "milkCost": 60,
+      "woolCost": 1000,
+      "totalCost": 1060,
+      "orderStatus": "completed"
+    },
+    {
+      "id": 344333,
       "milk": 20,
-      "wool": 30,
-      "date": "2025-01-17T05:15:12.234Z",
+      "wool": 2,
+      "date": "2025-01-15T11:13:45.279Z",
+      "milkCost": 600,
+      "woolCost": 1000,
+      "totalCost": 1600,
       "orderStatus": "completed"
     },
     {
-      "id": 953124,
+      "id": 321321,
+      "milk": 6,
+      "wool": 4,
+      "date": "2025-01-15T11:14:09.498Z",
+      "milkCost": 180,
+      "woolCost": 2000,
+      "totalCost": 2180,
+      "orderStatus": "completed"
+    },
+    {
+      "id": 321321,
       "milk": 10,
-      "wool": 20,
-      "date": "2025-01-17T05:16:38.954Z",
+      "wool": 0,
+      "date": "2025-01-16T11:14:09.498Z",
+      "milkCost": 300,
+      "woolCost": 0,
+      "totalCost": 3000,
       "orderStatus": "completed"
     },
     {
-      "id": 429410,
-      "milk": 20,
-      "wool": 30,
-      "date": "2025-01-17T05:17:50.816Z",
-      "orderStatus": "completed"
-    },
-    {
-      "id": 112311,
+      "id": 637341,
       "milk": 10,
-      "wool": 15,
-      "date": "2025-01-17T05:18:58.586Z",
+      "wool": 2,
+      "date": "2025-01-17T11:13:45.279Z",
+      "milkCost": 300,
+      "woolCost": 1000,
+      "totalCost": 1300,
       "orderStatus": "completed"
     },
     {
-      "id": 802063,
-      "milk": 11,
-      "wool": 11,
-      "date": "2025-01-17T05:21:42.216Z",
+      "id": 413158,
+      "milk": 2,
+      "wool": 1,
+      "date": "2025-01-17T11:14:09.498Z",
+      "milkCost": 60,
+      "woolCost": 500,
+      "totalCost": 560,
       "orderStatus": "completed"
     }
   ]

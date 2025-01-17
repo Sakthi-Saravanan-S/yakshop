@@ -14,7 +14,7 @@ const CustomTable = ({ rows, columns, darkMode, defaultPageSize = 5 }) => {
         rows={rows}
         columns={columns}
         pageSize={5}
-        rowsPerPageOptions={[5, 10, 15]} // Rows per page options: 5, 10, 15
+        rowsPerPageOptions={[5, 10, 15]}
         disableSelectionOnClick
         disableRowSelectionOnClick
         disableColumnSelector

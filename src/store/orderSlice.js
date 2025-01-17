@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { placeOrder, fetchOrderHistory } from "../api/yakApi";
 
 const initialState = {
-  orderHistory: [], // Initialize the orderHistory array
+  orderHistory: [],
   orderStatus: "",
   orderError: null,
   loading: false,
@@ -10,8 +10,8 @@ const initialState = {
 
 export const placeCustomerOrder = createAsyncThunk(
   "order/placeCustomerOrder",
-  async ({ milk, wool, date, id }, { getState }) => {
-    const { stock } = getState(); // Get current stock from state
+  async ({ milk, wool, date, id, milkCost, woolCost, totalCost }, { getState }) => {
+    const { stock } = getState();
 
     if (milk > stock.milkStock) {
       throw new Error("Insufficient milk stock.");
@@ -20,7 +20,7 @@ export const placeCustomerOrder = createAsyncThunk(
       throw new Error("Insufficient wool stock.");
     }
 
-    const orderData = await placeOrder(milk, wool, date, id);
+    const orderData = await placeOrder(milk, wool, date, id, milkCost, woolCost, totalCost);
 
     return orderData;
   }

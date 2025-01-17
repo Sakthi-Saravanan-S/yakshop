@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getHerd } from "../store/stockSlice";
+import { getOrderHistory } from "../store/orderSlice";
 import "./StockDashboard.scss";
 import {
   PieChart,
@@ -14,6 +15,8 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
+  LineChart,
+  Line,
 } from "recharts";
 import {
   MenuItem,
@@ -24,6 +27,7 @@ import {
   Typography,
 } from "@mui/material";
 import { calculateMilkProductionPerDay, calculateWoolStock } from "../utils";
+import { format } from "date-fns";
 
 const COLORS = ["#4BC0C0", "#FF6384", "#36A2EB", "#FFCE56", "#7EC8E3"];
 
@@ -37,6 +41,7 @@ const StockDashboard = () => {
 
   useEffect(() => {
     dispatch(getHerd());
+    dispatch(getOrderHistory());
   }, [dispatch]);
 
   const filterData = () => {
@@ -54,11 +59,11 @@ const StockDashboard = () => {
   }, [yakFilter, stock.herd]);
 
   const totalOrderedMilk = orderHistory
-    .filter((orderInfo) => orderInfo.status === "pending")
+    .filter((orderInfo) => orderInfo.orderStatus === "pending")
     .reduce((sum, orderInfo) => sum + orderInfo.milk, 0);
 
   const totalOrderedWool = orderHistory
-    .filter((orderInfo) => orderInfo.status === "pending")
+    .filter((orderInfo) => orderInfo.orderStatus === "pending")
     .reduce((sum, orderInfo) => sum + orderInfo.wool, 0);
 
   const chartData = filteredHerd.map((yak) => {
@@ -86,6 +91,27 @@ const StockDashboard = () => {
 
   const totalMilk = stock.milkStock - totalOrderedMilk;
   const totalWool = stock.woolStock - totalOrderedWool;
+
+  const aggregatedRevenueData = orderHistory.reduce((acc, order) => {
+    const formattedDate = format(new Date(order.date), "yyyy-MM-dd");
+
+    if (!acc[formattedDate]) {
+      acc[formattedDate] = {
+        date: formattedDate,
+        milkCost: 0,
+        woolCost: 0,
+        totalCost: 0,
+      };
+    }
+
+    acc[formattedDate].milkCost += order.milkCost || 0;
+    acc[formattedDate].woolCost += order.woolCost || 0;
+    acc[formattedDate].totalCost += order.totalCost || 0;
+
+    return acc;
+  }, {});
+
+  const revenueData = Object.values(aggregatedRevenueData);
 
   return (
     <div className={`stock-dashboard-container ${darkMode ? "dark" : ""}`}>
@@ -137,9 +163,9 @@ const StockDashboard = () => {
         >
           <div style={{ flex: "1 1 45%", padding: "10px" }}>
             <Typography
-              variant="h6"
+              variant="h5"
               align="center"
-              sx={{ fontSize: "16px", marginBottom: 2 }}
+              sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
             >
               Milk Production Comparison (Liters)
             </Typography>
@@ -161,7 +187,7 @@ const StockDashboard = () => {
                     />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => `${value} Liters`} />
+                <Tooltip formatter={(value) => `${value} Liters/Day`} />
                 <Legend />
               </PieChart>
             </ResponsiveContainer>
@@ -169,9 +195,9 @@ const StockDashboard = () => {
 
           <div style={{ flex: "1 1 45%", padding: "10px" }}>
             <Typography
-              variant="h6"
+              variant="h5"
               align="center"
-              sx={{ fontSize: "16px", marginBottom: 2 }}
+              sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
             >
               Wool Production Comparison (Skins)
             </Typography>
@@ -201,11 +227,49 @@ const StockDashboard = () => {
 
           <div style={{ flex: "1 1 100%", padding: "10px" }}>
             <Typography
-              variant="h6"
+              variant="h5"
               align="center"
-              sx={{ fontSize: "16px", marginBottom: 2 }}
+              sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
             >
-              Overall Milk and Wool Levels
+              Revenue Comparison (Milk, Wool, Total)
+            </Typography>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={revenueData}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip
+                  labelFormatter={(label) => `Date: ${label}`}
+                  formatter={(value, name) => `₹${value}`}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="milkCost"
+                  stroke="#4BC0C0"
+                  activeDot={{ r: 8 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="woolCost"
+                  stroke="#FF6384"
+                  activeDot={{ r: 8 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="totalCost"
+                  stroke="#36A2EB"
+                  activeDot={{ r: 8 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div style={{ flex: "1 1 100%", padding: "10px" }}>
+            <Typography
+              variant="h5"
+              align="center"
+              sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
+            >
+              Overall Milk and Wool Stock Levels
             </Typography>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
@@ -216,7 +280,7 @@ const StockDashboard = () => {
                 <YAxis />
                 <Tooltip
                   formatter={(value, name) =>
-                    `${value} ${name === "milk" ? "Liters" : "Skins"}`
+                    `${value} ${name === "milk" ? "Liters/Day" : "Skins"}`
                   }
                 />
                 <Bar dataKey="milk" fill="#4BC0C0" barSize={120} />
@@ -227,9 +291,9 @@ const StockDashboard = () => {
 
           <div style={{ flex: "1 1 100%", padding: "10px" }}>
             <Typography
-              variant="h6"
+              variant="h5"
               align="center"
-              sx={{ fontSize: "16px", marginBottom: 2 }}
+              sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
             >
               Milk vs Wool Production Comparison
             </Typography>
@@ -240,7 +304,7 @@ const StockDashboard = () => {
                 <YAxis />
                 <Tooltip
                   formatter={(value, name) =>
-                    `${value} ${name === "milk" ? "Liters" : "Skins"}`
+                    `${value} ${name === "milk" ? "Liters/Day" : "Skins"}`
                   }
                 />
                 <Legend />
@@ -251,9 +315,7 @@ const StockDashboard = () => {
           </div>
         </div>
       ) : (
-        <Typography variant="h6" sx={{ textAlign: "center", width: "100%" }}>
-          No data available for the selected filters.
-        </Typography>
+        <p>No herd data available.</p>
       )}
     </div>
   );
