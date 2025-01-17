@@ -4,22 +4,31 @@
       "id": "1",
       "name": "Betty-1",
       "age": 4,
-      "sex": "f",
-      "lastShavedDay": 10
+      "sex": "f"
     },
     {
       "id": "2",
       "name": "Betty-2",
       "age": 8,
-      "sex": "f",
-      "lastShavedDay": 40
+      "sex": "f"
     },
     {
       "id": "3",
       "name": "Betty-3",
       "age": 9.5,
-      "sex": "f",
-      "lastShavedDay": 95
+      "sex": "f"
+    },
+    {
+      "id": "4",
+      "name": "Betty-4",
+      "age": 1,
+      "sex": "f"
+    },
+    {
+      "id": "5",
+      "name": "Betty-5",
+      "age": 10,
+      "sex": "f"
     }
   ],
   "stock": {
@@ -28,10 +37,46 @@
   },
   "orders": [
     {
-      "id": "9099",
+      "id": 133132,
       "milk": 10,
       "wool": 20,
-      "date": "2025-01-16T14:30:21.980Z"
+      "date": "2025-01-17T05:04:06.203Z",
+      "orderStatus": "completed"
+    },
+    {
+      "id": 265556,
+      "milk": 20,
+      "wool": 30,
+      "date": "2025-01-17T05:15:12.234Z",
+      "orderStatus": "completed"
+    },
+    {
+      "id": 953124,
+      "milk": 10,
+      "wool": 20,
+      "date": "2025-01-17T05:16:38.954Z",
+      "orderStatus": "completed"
+    },
+    {
+      "id": 429410,
+      "milk": 20,
+      "wool": 30,
+      "date": "2025-01-17T05:17:50.816Z",
+      "orderStatus": "completed"
+    },
+    {
+      "id": 112311,
+      "milk": 10,
+      "wool": 15,
+      "date": "2025-01-17T05:18:58.586Z",
+      "orderStatus": "completed"
+    },
+    {
+      "id": 802063,
+      "milk": 11,
+      "wool": 11,
+      "date": "2025-01-17T05:21:42.216Z",
+      "orderStatus": "completed"
     }
   ]
 }

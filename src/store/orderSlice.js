@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { placeOrder } from "../api/yakApi";
+import { placeOrder, fetchOrderHistory } from "../api/yakApi";
 
 const initialState = {
   orderHistory: [], // Initialize the orderHistory array
@@ -10,7 +10,7 @@ const initialState = {
 
 export const placeCustomerOrder = createAsyncThunk(
   "order/placeCustomerOrder",
-  async ({ milk, wool }, { getState }) => {
+  async ({ milk, wool, date, id }, { getState }) => {
     const { stock } = getState(); // Get current stock from state
 
     if (milk > stock.milkStock) {
@@ -20,12 +20,16 @@ export const placeCustomerOrder = createAsyncThunk(
       throw new Error("Insufficient wool stock.");
     }
 
-    // Place order logic (you can call an API here)
-    const orderData = await placeOrder(milk, wool);
+    const orderData = await placeOrder(milk, wool, date, id);
 
     return orderData;
   }
 );
+
+export const getOrderHistory = createAsyncThunk("order/getOrderHistory", async () => {
+  const orderHistory = await fetchOrderHistory();
+  return orderHistory;
+});
 
 const orderSlice = createSlice({
   name: "order",
@@ -36,9 +40,8 @@ const orderSlice = createSlice({
       state.orderError = null;
       state.loading = false;
     },
-    // Add the action for updating the order history
     addOrderToHistory: (state, action) => {
-      state.orderHistory.push(action.payload); // Add the new order to the history
+      state.orderHistory.unshift(action.payload);
     },
   },
   extraReducers: (builder) => {
@@ -60,6 +63,14 @@ const orderSlice = createSlice({
         state.loading = false;
         state.orderError = action.error.message || "Failed to place the order.";
         state.orderStatus = "";
+      })
+      .addCase(getOrderHistory.fulfilled, (state, action) => {
+        if (state.orderHistory.length === 0) {
+          state.orderHistory = action.payload.map((order) => ({
+            ...order,
+            orderStatus: "completed"
+          }));
+        }
       });
   },
 });

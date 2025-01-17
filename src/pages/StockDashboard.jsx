@@ -23,13 +23,14 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { calculateMilkProduction, calculateWoolStock } from "../utils";
+import { calculateMilkProductionPerDay, calculateWoolStock } from "../utils";
 
 const COLORS = ["#4BC0C0", "#FF6384", "#36A2EB", "#FFCE56", "#7EC8E3"];
 
 const StockDashboard = () => {
   const dispatch = useDispatch();
   const stock = useSelector((state) => state.stock);
+  const orderHistory = useSelector((state) => state.order.orderHistory);
   const darkMode = useSelector((state) => state.theme.darkMode);
   const [yakFilter, setYakFilter] = useState("");
   const [filteredHerd, setFilteredHerd] = useState(stock.herd);
@@ -52,13 +53,24 @@ const StockDashboard = () => {
     filterData();
   }, [yakFilter, stock.herd]);
 
+  const totalOrderedMilk = orderHistory
+    .filter((orderInfo) => orderInfo.status === "pending")
+    .reduce((sum, orderInfo) => sum + orderInfo.milk, 0);
+
+  const totalOrderedWool = orderHistory
+    .filter((orderInfo) => orderInfo.status === "pending")
+    .reduce((sum, orderInfo) => sum + orderInfo.wool, 0);
+
   const chartData = filteredHerd.map((yak) => {
     const ageInDays = yak.age * 100;
 
     return {
       name: yak.name,
-      milk: calculateMilkProduction(ageInDays),
-      wool: calculateWoolStock(ageInDays),
+      milk:
+        calculateMilkProductionPerDay(ageInDays) -
+        totalOrderedMilk / filteredHerd.length,
+      wool:
+        calculateWoolStock(ageInDays) - totalOrderedWool / filteredHerd.length,
     };
   });
 
@@ -72,10 +84,8 @@ const StockDashboard = () => {
     value: yak.wool,
   }));
 
-  const totalMilk = chartData
-    .reduce((acc, yak) => acc + yak.milk, 0)
-    .toFixed(2);
-  const totalWool = chartData.reduce((acc, yak) => acc + yak.wool, 0);
+  const totalMilk = stock.milkStock - totalOrderedMilk;
+  const totalWool = stock.woolStock - totalOrderedWool;
 
   return (
     <div className={`stock-dashboard-container ${darkMode ? "dark" : ""}`}>

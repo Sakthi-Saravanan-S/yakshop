@@ -68,6 +68,10 @@
       background-color: #555;
       color: #fff;
     }
+
+    td.milk-production, td.wool-stock {
+      text-align: right;
+    }
   }
 
   .loading-message {

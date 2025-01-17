@@ -1,39 +1,31 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { fetchHerd } from "../api/yakApi"; // Importing API functions
-import { calculateMilkProduction, calculateWoolStock } from "../utils"; // Importing utility functions
+import { fetchHerd } from "../api/yakApi";
+import { calculateMilkProductionPerDay, calculateWoolStock } from "../utils";
 
-// Initial state
 const initialState = {
-  herd: [], // List of Yaks in the herd
-  milkStock: 0, // Amount of milk in stock
-  woolStock: 0, // Amount of wool in stock
-  loading: false, // Loading state for API calls
-  error: null, // Error state for API calls
+  herd: [],
+  milkStock: 0,
+  woolStock: 0,
+  loading: false,
+  error: null,
 };
 
-// Async Thunks for fetching herd and stock data
 export const getHerd = createAsyncThunk("stock/getHerd", async () => {
-  const herdData = await fetchHerd(); // Call to fetch herd data
-  
-  // Calculate milk and wool stock based on the herd
+  const herdData = await fetchHerd();
   let totalMilk = 0;
   let totalWool = 0;
 
   herdData.forEach((yak) => {
     const ageInDays = yak.age * 100;
-    // Calculate milk production using the utility function
-    const milkProducedPerDay = calculateMilkProduction(ageInDays);
-    totalMilk += Math.max(milkProducedPerDay, 0); // Ensure no negative production
-
-    // Calculate wool stock using the utility function
-    const woolShaveFrequency = calculateWoolStock(ageInDays);
-    totalWool += woolShaveFrequency;
+    const milkProducedPerDay = calculateMilkProductionPerDay(ageInDays);
+    totalMilk += Math.max(milkProducedPerDay, 0);
+    const woolProducedPerYak = calculateWoolStock(ageInDays);
+    totalWool += woolProducedPerYak;
   });
 
   return { herdData, totalMilk, totalWool };
 });
 
-// Slice definition
 const stockSlice = createSlice({
   name: "stock",
   initialState,
@@ -53,20 +45,14 @@ const stockSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Handle fetching herd data
       .addCase(getHerd.pending, (state) => {
         state.loading = true;
       })
       .addCase(getHerd.fulfilled, (state, action) => {
         state.loading = false;
         state.herd = action.payload.herdData;
-
-        // Update milkStock and woolStock directly here
         state.milkStock = action.payload.totalMilk;
         state.woolStock = action.payload.totalWool;
-
-        console.log("Milk Stock:", state.milkStock);
-        console.log("Wool Stock:", state.woolStock);
       })
       .addCase(getHerd.rejected, (state, action) => {
         state.loading = false;

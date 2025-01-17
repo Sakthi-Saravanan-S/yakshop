@@ -3,8 +3,10 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  height: 100vh;
   padding: 20px;
+  .order-form-card {
+    overflow: auto;
+  }
 }
 
 .order-form-card {
@@ -36,9 +38,9 @@
 }
 
 .order-history {
-  width: 100%;
+  width: 1000px;
   max-width: 100%;
-  margin-top: 20px;
+  margin: 20px;
   display: flex;
   justify-content: center;
   flex-direction: column;

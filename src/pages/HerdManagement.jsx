@@ -1,7 +1,13 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getHerd } from "../store/stockSlice";
-import { calculateMilkProduction, calculateWoolStock } from "../utils";
+import CustomTable from "../components/CustomTable";
+import {
+  calculateOverallMilkProductionPerYak,
+  calculateWoolStock,
+  calculateMilkProductionPerDay,
+  calculateShaveFrequency,
+} from "../utils";
 import "./HerdManagement.scss";
 
 const HerdManagement = () => {
@@ -13,40 +19,32 @@ const HerdManagement = () => {
     dispatch(getHerd());
   }, [dispatch]);
 
+  const columns = [
+    { field: "name", headerName: "Name", width: 150, resizable: false },
+    { field: "age", headerName: "Age (in Years and Days)", width: 200, resizable: false },
+    { field: "milkProductionPerDay", headerName: "Milk Production (Liters/Day)", width: 220, align: "right", resizable: false },
+    { field: "totalMilkProduction", headerName: "Total Milk Production (Liters)", width: 240, align: "right", resizable: false },
+    { field: "shaveFrequency", headerName: "Shave Frequency", width: 180, resizable: false },
+    { field: "totalWoolProduction", headerName: "Total Wool Production (Skins)", width: 220, align: "right", resizable: false },
+  ];
+
+  const rows = herd.map((yak, index) => {
+    const ageInDays = yak.age * 100;
+    return {
+      id: index + 1,
+      name: yak.name,
+      age: `${Math.floor(ageInDays / 100)} Years, ${ageInDays % 100} Days`,
+      milkProductionPerDay: `${calculateMilkProductionPerDay(ageInDays).toFixed(2)} L`,
+      totalMilkProduction: `${calculateOverallMilkProductionPerYak(ageInDays).toFixed(2)} L`,
+      shaveFrequency: `${calculateShaveFrequency(ageInDays)} Day/Shave`,
+      totalWoolProduction: calculateWoolStock(ageInDays),
+    };
+  });
+
   return (
     <div className={`herd-management-container ${darkMode ? "dark" : "light"}`}>
       {herd.length > 0 ? (
-        <div>
-          <table className={`herd-table ${darkMode ? "dark" : "light"}`}>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Age (in Years and Days)</th>
-                <th>Milk Production (Liters/Day)</th>
-                <th>Wool Stock (Skins)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {herd.map((yak) => {
-                const ageInDays = yak.age * 100;
-                return (
-                  <tr key={yak.name}>
-                    <td>{yak.name}</td>
-                    <td className="age">{`${Math.floor(
-                      ageInDays / 100
-                    )} Years, ${ageInDays % 100} Days`}</td>
-                    <td className="milk-production">
-                      {calculateMilkProduction(ageInDays).toFixed(2)}
-                    </td>
-                    <td className="wool-stock">
-                      {calculateWoolStock(ageInDays)}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <CustomTable rows={rows} columns={columns} darkMode={darkMode} />
       ) : (
         <p className="loading-message">Loading herd data...</p>
       )}

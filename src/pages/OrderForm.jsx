@@ -1,17 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { placeCustomerOrder } from "../store/orderSlice";
+import { placeCustomerOrder, addOrderToHistory, getOrderHistory } from "../store/orderSlice";
 import { getHerd } from "../store/stockSlice";
-import { addOrderToHistory } from "../store/orderSlice"; // Correct import
-import {
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Alert,
-  Card,
-  CardContent,
-} from "@mui/material";
+import { Alert, Box, Button, Card, CardContent, TextField, Typography } from "@mui/material";
+import CustomTable from "../components/CustomTable";
 import "./OrderForm.scss";
 
 const OrderForm = () => {
@@ -27,6 +19,7 @@ const OrderForm = () => {
 
   useEffect(() => {
     dispatch(getHerd());
+    dispatch(getOrderHistory())
   }, [dispatch]);
 
   const handleSubmit = (e) => {
@@ -71,14 +64,18 @@ const OrderForm = () => {
     const order = {
       milk: Math.min(milkAmountNum, milkAvailable),
       wool: Math.min(woolAmountNum, woolAvailable),
-      date: new Date().toISOString(), // Add date to the order
+      date: new Date().toISOString(),
+      id: Math.floor(100000 + Math.random() * 900000),  // 6-digit random number
+      orderStatus: "pending"
     };
 
     dispatch(placeCustomerOrder(order))
       .then(() => {
         if (order.milk === milkAmountNum && order.wool === woolAmountNum) {
           setSuccessMessage("Order placed successfully!");
-          dispatch(addOrderToHistory(order)); // Add to order history
+          dispatch(addOrderToHistory(order));
+          setMilkAmount("");
+          setWoolAmount("");
         } else {
           setPartialMessage("Partial order fulfilled!");
         }
@@ -103,21 +100,10 @@ const OrderForm = () => {
   };
 
   return (
-    <div
-      className={`order-form-container ${
-        darkMode ? "dark-mode" : "light-mode"
-      }`}
-    >
-      <Card
-        className={`order-form-card ${darkMode ? "dark-mode" : "light-mode"}`}
-      >
+    <div className={`order-form-container ${darkMode ? "dark-mode" : "light-mode"}`}>
+      <Card className={`order-form-card ${darkMode ? "dark-mode" : "light-mode"}`}>
         <CardContent>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            autoComplete="off"
-          >
+          <Box component="form" onSubmit={handleSubmit} noValidate autoComplete="off">
             <TextField
               label="Milk (liters)"
               type="number"
@@ -127,9 +113,7 @@ const OrderForm = () => {
               margin="normal"
               error={!!error && woolAmount === "" && milkAmount === ""}
               helperText={
-                error && woolAmount === "" && milkAmount === ""
-                  ? "Milk amount is required"
-                  : ""
+                error && woolAmount === "" && milkAmount === "" ? "Milk amount is required" : ""
               }
               InputProps={{ inputProps: { max: 1000 } }}
             />
@@ -142,38 +126,18 @@ const OrderForm = () => {
               margin="normal"
               error={!!error && woolAmount === "" && milkAmount === ""}
               helperText={
-                error && woolAmount === "" && milkAmount === ""
-                  ? "Wool amount is required"
-                  : ""
+                error && woolAmount === "" && milkAmount === "" ? "Wool amount is required" : ""
               }
               InputProps={{ inputProps: { max: 1000 } }}
             />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              fullWidth
-              sx={{ marginTop: 2 }}
-            >
+            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }}>
               Place Order
             </Button>
           </Box>
 
-          {error && (
-            <Alert severity="error" sx={{ marginTop: 2 }}>
-              {error}
-            </Alert>
-          )}
-          {successMessage && (
-            <Alert severity="success" sx={{ marginTop: 2 }}>
-              {successMessage}
-            </Alert>
-          )}
-          {partialMessage && (
-            <Alert severity="warning" sx={{ marginTop: 2 }}>
-              {partialMessage}
-            </Alert>
-          )}
+          {error && <Alert severity="error" sx={{ marginTop: 2 }}>{error}</Alert>}
+          {successMessage && <Alert severity="success" sx={{ marginTop: 2 }}>{successMessage}</Alert>}
+          {partialMessage && <Alert severity="warning" sx={{ marginTop: 2 }}>{partialMessage}</Alert>}
         </CardContent>
       </Card>
 
@@ -181,32 +145,30 @@ const OrderForm = () => {
         <Typography variant="h6" gutterBottom>
           Order History
         </Typography>
-        <table>
-          <thead>
-            <tr>
-              <th>Milk (liters)</th>
-              <th>Wool (skins)</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orderHistory.length > 0 ? (
-              orderHistory.map((order, index) => (
-                <tr key={index}>
-                  <td>{order.milk}</td>
-                  <td>{order.wool}</td>
-                  <td>{new Date(order.date).toLocaleString()}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" style={{ textAlign: "center" }}>
-                  No orders placed yet.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        {orderHistory.length > 0 ? (
+          <CustomTable
+            rows={orderHistory.map((order) => ({
+              id: `#${order.id}`,
+              milk: `${order.milk}L`,
+              wool: order.wool,
+              date: new Date(order.date).toLocaleString(),
+              orderId: order.orderId,
+              orderStatus: order.orderStatus,
+            }))}
+            columns={[
+              { field: "id", headerName: "Order ID", width: 150, resizable: false },
+              { field: "date", headerName: "Date", width: 250, resizable: false },
+              { field: "milk", headerName: "Milk (liters)", width: 150, align: "right", resizable: false },
+              { field: "wool", headerName: "Wool (skins)", width: 150, align: "right", resizable: false },
+              { field: "orderStatus", headerName: "Order Status", width: 200, resizable: false },
+            ]}
+            darkMode={darkMode}
+          />
+        ) : (
+          <Typography variant="body1" sx={{ marginTop: 2 }}>
+            No orders placed yet.
+          </Typography>
+        )}
       </div>
     </div>
   );
