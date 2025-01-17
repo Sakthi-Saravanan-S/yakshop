@@ -20,11 +20,10 @@ import {
 } from "recharts";
 import {
   MenuItem,
-  Select,
   FormControl,
-  InputLabel,
   Box,
   Typography,
+  TextField,
 } from "@mui/material";
 import { calculateMilkProductionPerDay, calculateWoolStock } from "../utils";
 import { format } from "date-fns";
@@ -47,7 +46,7 @@ const StockDashboard = () => {
   const filterData = () => {
     let filteredData = stock.herd;
 
-    if (yakFilter) {
+    if (yakFilter && yakFilter !== "All") {
       filteredData = filteredData.filter((yak) => yak.name === yakFilter);
     }
 
@@ -93,7 +92,7 @@ const StockDashboard = () => {
   const totalWool = stock.woolStock - totalOrderedWool;
 
   const aggregatedRevenueData = orderHistory.reduce((acc, order) => {
-    const formattedDate = format(new Date(order.date), "yyyy-MM-dd");
+    const formattedDate = format(new Date(order.date), "dd MMM yyyy");
 
     if (!acc[formattedDate]) {
       acc[formattedDate] = {
@@ -115,40 +114,93 @@ const StockDashboard = () => {
 
   return (
     <div className={`stock-dashboard-container ${darkMode ? "dark" : ""}`}>
+      {filteredHerd.length > 0 ? (
+        <div style={{ flex: "1 1 100%", padding: "10px" }}>
+          <Typography
+            variant="h5"
+            align="center"
+            sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
+          >
+            Overall Revenue Comparison By Orders
+          </Typography>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={revenueData}>
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip
+                labelFormatter={(label) => `Date: ${label}`}
+                formatter={(value, name) => {
+                  switch (name) {
+                    case "milkCost":
+                      return [`₹${value}`, "Revenue Generated From Milk"];
+                    case "woolCost":
+                      return [`₹${value}`, "Revenue Generated From Wool"];
+                    case "totalCost":
+                      return [`₹${value}`, "Total Revenue"];
+                    default:
+                      return value;
+                  }
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="milkCost"
+                stroke="#4BC0C0"
+                activeDot={{ r: 8 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="woolCost"
+                stroke="#FF6384"
+                activeDot={{ r: 8 }}
+              />
+              <Line
+                type="monotone"
+                dataKey="totalCost"
+                stroke="#36A2EB"
+                activeDot={{ r: 8 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <Typography
+          variant="h5"
+          align="center"
+          sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
+        >
+          No Orders Placed Yet.
+        </Typography>
+      )}
+
       <Box
         sx={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "flex-end",
           marginBottom: 2,
+          marginTop: 6,
           gap: 2,
           padding: "0 10px",
         }}
       >
         <FormControl fullWidth sx={{ maxWidth: "250px", minWidth: "200px" }}>
-          <InputLabel id="yak-filter-label">Filter by Yak</InputLabel>
-          <Select
-            labelId="yak-filter-label"
+          <TextField
+            select
+            label="Filter by Yak"
+            name="yakFilter"
             value={yakFilter}
             onChange={(e) => setYakFilter(e.target.value)}
-            label="Filter by Yak"
-            displayEmpty
-            sx={{ paddingTop: "15px" }}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 250,
-                },
-              },
-            }}
+            fullWidth
+            margin="normal"
           >
-            <MenuItem value="">All Yaks</MenuItem>
+            <MenuItem value="All">All Yaks</MenuItem>
             {stock.herd.map((yak) => (
               <MenuItem key={yak.id} value={yak.name}>
                 {yak.name}
               </MenuItem>
             ))}
-          </Select>
+          </TextField>
         </FormControl>
       </Box>
 
@@ -231,57 +283,29 @@ const StockDashboard = () => {
               align="center"
               sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
             >
-              Revenue Comparison (Milk, Wool, Total)
-            </Typography>
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={revenueData}>
-                <XAxis dataKey="date" />
-                <YAxis />
-                <Tooltip
-                  labelFormatter={(label) => `Date: ${label}`}
-                  formatter={(value, name) => `₹${value}`}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="milkCost"
-                  stroke="#4BC0C0"
-                  activeDot={{ r: 8 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="woolCost"
-                  stroke="#FF6384"
-                  activeDot={{ r: 8 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="totalCost"
-                  stroke="#36A2EB"
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div style={{ flex: "1 1 100%", padding: "10px" }}>
-            <Typography
-              variant="h5"
-              align="center"
-              sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
-            >
               Overall Milk and Wool Stock Levels
             </Typography>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
-                data={[{ name: "Total", milk: totalMilk, wool: totalWool }]}
+                data={[
+                  {
+                    name: "Current Stock Level",
+                    milk: totalMilk,
+                    wool: totalWool,
+                  },
+                ]}
               >
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip
-                  formatter={(value, name) =>
-                    `${value} ${name === "milk" ? "Liters/Day" : "Skins"}`
-                  }
+                  labelFormatter={() => `Current Stock Level`}
+                  formatter={(value, name) => {
+                    return [
+                      `${value} ${name === "milk" ? "Liters" : "Skins"}`,
+                      `${name === "milk" ? "Milk" : "Wool"}`,
+                    ];
+                  }}
                 />
                 <Bar dataKey="milk" fill="#4BC0C0" barSize={120} />
                 <Bar dataKey="wool" fill="#FF6384" barSize={120} />
@@ -303,11 +327,20 @@ const StockDashboard = () => {
                 <XAxis dataKey="name" interval={0} margin={{ bottom: 30 }} />
                 <YAxis />
                 <Tooltip
-                  formatter={(value, name) =>
-                    `${value} ${name === "milk" ? "Liters/Day" : "Skins"}`
-                  }
+                  formatter={(value, name) => {
+                    return [
+                      `${value} ${name === "milk" ? "Liters/Day" : "Skins"}`,
+                      `${name === "milk" ? "Milk" : "Wool"}`,
+                    ];
+                  }}
                 />
-                <Legend />
+                <Legend
+                  formatter={(value) => {
+                    if (value === "milk") return "Milk";
+                    if (value === "wool") return "Wool";
+                    return value;
+                  }}
+                />
                 <Bar dataKey="milk" fill="#4BC0C0" stackId="a" barSize={40} />
                 <Bar dataKey="wool" fill="#FF6384" stackId="a" barSize={40} />
               </BarChart>
