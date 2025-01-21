@@ -6,7 +6,7 @@ const API_URL = "https://yakshop-db.onrender.com";
 export const fetchHerd = async () => {
   try {
     const response = await axios.get(`${API_URL}/herd`);
-    return response.data; // Return herd data
+    return response.data;
   } catch (error) {
     throw new Error('Error fetching herd data: ' + error)
   }

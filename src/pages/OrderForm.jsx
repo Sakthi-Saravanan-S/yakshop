@@ -197,7 +197,7 @@ const OrderForm = () => {
             />
             <div className="info-icon-container">
               <Tooltip title="Enter the amount of milk you want to order.">
-                <FaInfoCircle className="info-icon" />
+                <span><FaInfoCircle className="info-icon" /></span>
               </Tooltip>
               <Typography
                 variant="caption"
@@ -226,7 +226,7 @@ const OrderForm = () => {
             />
             <div className="info-icon-container">
               <Tooltip title="Enter the amount of wool you want to order.">
-                <FaInfoCircle className="info-icon" />
+                <span><FaInfoCircle className="info-icon" /></span>
               </Tooltip>
               <Typography
                 variant="caption"
