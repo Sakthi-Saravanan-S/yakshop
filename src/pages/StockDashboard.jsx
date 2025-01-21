@@ -115,53 +115,90 @@ const StockDashboard = () => {
   return (
     <div className={`stock-dashboard-container ${darkMode ? "dark" : ""}`}>
       {filteredHerd.length > 0 ? (
-        <div style={{ flex: "1 1 100%", padding: "10px" }}>
-          <Typography
-            variant="h5"
-            align="center"
-            sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
-          >
-            Overall Revenue Comparison By Orders
-          </Typography>
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={revenueData}>
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip
-                labelFormatter={(label) => `Date: ${label}`}
-                formatter={(value, name) => {
-                  switch (name) {
-                    case "milkCost":
-                      return [`₹${value}`, "Revenue Generated From Milk"];
-                    case "woolCost":
-                      return [`₹${value}`, "Revenue Generated From Wool"];
-                    case "totalCost":
-                      return [`₹${value}`, "Total Revenue"];
-                    default:
-                      return value;
-                  }
-                }}
-              />
-              <Line
-                type="monotone"
-                dataKey="milkCost"
-                stroke="#4BC0C0"
-                activeDot={{ r: 8 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="woolCost"
-                stroke="#FF6384"
-                activeDot={{ r: 8 }}
-              />
-              <Line
-                type="monotone"
-                dataKey="totalCost"
-                stroke="#36A2EB"
-                activeDot={{ r: 8 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+        <div>
+          <div style={{ flex: "1 1 100%", padding: "10px" }}>
+            <Typography
+              variant="h5"
+              align="center"
+              sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
+            >
+              Overall Revenue Comparison By Orders
+            </Typography>
+            <ResponsiveContainer width="100%" height={400}>
+              <LineChart data={revenueData}>
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip
+                  labelFormatter={(label) => `Date: ${label}`}
+                  formatter={(value, name) => {
+                    switch (name) {
+                      case "milkCost":
+                        return [`₹${value}`, "Revenue Generated From Milk"];
+                      case "woolCost":
+                        return [`₹${value}`, "Revenue Generated From Wool"];
+                      case "totalCost":
+                        return [`₹${value}`, "Total Revenue"];
+                      default:
+                        return value;
+                    }
+                  }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="milkCost"
+                  stroke="#4BC0C0"
+                  activeDot={{ r: 8 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="woolCost"
+                  stroke="#FF6384"
+                  activeDot={{ r: 8 }}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="totalCost"
+                  stroke="#36A2EB"
+                  activeDot={{ r: 8 }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div style={{ flex: "1 1 100%", padding: "10px" }}>
+            <Typography
+              variant="h5"
+              align="center"
+              sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
+            >
+              Overall Milk and Wool Stock Levels
+            </Typography>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={[
+                  {
+                    name: "Current Stock Level",
+                    milk: totalMilk,
+                    wool: totalWool,
+                  },
+                ]}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip
+                  labelFormatter={() => `Current Stock Level`}
+                  formatter={(value, name) => {
+                    return [
+                      `${value} ${name === "milk" ? "Liters" : "Skins"}`,
+                      `${name === "milk" ? "Milk" : "Wool"}`,
+                    ];
+                  }}
+                />
+                <Bar dataKey="milk" fill="#4BC0C0" barSize={120} />
+                <Bar dataKey="wool" fill="#FF6384" barSize={120} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       ) : (
         <Typography
@@ -274,42 +311,6 @@ const StockDashboard = () => {
                 <Tooltip formatter={(value) => `${value} Skins`} />
                 <Legend />
               </PieChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div style={{ flex: "1 1 100%", padding: "10px" }}>
-            <Typography
-              variant="h5"
-              align="center"
-              sx={{ fontSize: "20px", fontWeight: "500", marginBottom: 2 }}
-            >
-              Overall Milk and Wool Stock Levels
-            </Typography>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={[
-                  {
-                    name: "Current Stock Level",
-                    milk: totalMilk,
-                    wool: totalWool,
-                  },
-                ]}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip
-                  labelFormatter={() => `Current Stock Level`}
-                  formatter={(value, name) => {
-                    return [
-                      `${value} ${name === "milk" ? "Liters" : "Skins"}`,
-                      `${name === "milk" ? "Milk" : "Wool"}`,
-                    ];
-                  }}
-                />
-                <Bar dataKey="milk" fill="#4BC0C0" barSize={120} />
-                <Bar dataKey="wool" fill="#FF6384" barSize={120} />
-              </BarChart>
             </ResponsiveContainer>
           </div>
 

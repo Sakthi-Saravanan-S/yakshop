@@ -41,7 +41,7 @@ const orderSlice = createSlice({
       state.loading = false;
     },
     addOrderToHistory: (state, action) => {
-      state.orderHistory.unshift(action.payload);
+      state.orderHistory.push(action.payload);
     },
   },
   extraReducers: (builder) => {

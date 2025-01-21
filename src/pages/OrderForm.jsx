@@ -153,6 +153,17 @@ const OrderForm = () => {
       );
   };
 
+  const sortedOrderHistory = [...orderHistory]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .map((order) => ({
+      id: `#${order.id}`,
+      milk: `${order.milk}L`,
+      wool: `${order.wool}`,
+      totalCost: `₹${order.totalCost}`,
+      date: new Date(order.date).toLocaleString(),
+      orderStatus: order.orderStatus,
+    }));
+
   const {
     milkAmount,
     woolAmount,
@@ -197,7 +208,9 @@ const OrderForm = () => {
             />
             <div className="info-icon-container">
               <Tooltip title="Enter the amount of milk you want to order.">
-                <span><FaInfoCircle className="info-icon" /></span>
+                <span>
+                  <FaInfoCircle className="info-icon" />
+                </span>
               </Tooltip>
               <Typography
                 variant="caption"
@@ -226,7 +239,9 @@ const OrderForm = () => {
             />
             <div className="info-icon-container">
               <Tooltip title="Enter the amount of wool you want to order.">
-                <span><FaInfoCircle className="info-icon" /></span>
+                <span>
+                  <FaInfoCircle className="info-icon" />
+                </span>
               </Tooltip>
               <Typography
                 variant="caption"
@@ -303,15 +318,7 @@ const OrderForm = () => {
         </Typography>
         {orderHistory.length > 0 ? (
           <CustomTable
-            rows={orderHistory.map((order) => ({
-              id: `#${order.id}`,
-              milk: `${order.milk}L`,
-              wool: order.wool,
-              totalCost: `₹${order.totalCost}`,
-              date: new Date(order.date).toLocaleString(),
-              orderId: order.orderId,
-              orderStatus: order.orderStatus,
-            }))}
+            rows={sortedOrderHistory}
             columns={[
               {
                 field: "id",

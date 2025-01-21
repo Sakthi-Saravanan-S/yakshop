@@ -1,7 +1,5 @@
 import axios from "axios";
-
-// const API_URL = "http://localhost:5000";
-const API_URL = "https://yakshop-db.onrender.com";
+import { API_URL } from '../utils'
 
 export const fetchHerd = async () => {
   try {

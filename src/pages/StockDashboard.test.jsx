@@ -7,6 +7,7 @@ import orderReducer from "../store/orderSlice";
 import themeReducer from "../store/themeSlice";
 import userEvent from '@testing-library/user-event';
 
+jest.mock('axios');
 jest.mock("./StockDashboard.scss", () => ({}));
 jest.mock("../utils", () => ({
   calculateMilkProductionPerDay: jest.fn().mockReturnValue(10),
@@ -28,50 +29,58 @@ jest.mock("recharts", () => ({
   Line: jest.fn().mockReturnValue(null),
 }));
 
-const mockStore = configureStore({
-  reducer: {
-    stock: stockReducer,
-    order: orderReducer,
-    theme: themeReducer,
+const initialState = {
+  stock: {
+    herd: [{ id: 1, name: "Yak1", age: 2 }],
+    milkStock: 100,
+    woolStock: 50,
   },
-  preloadedState: {
-    stock: {
-      herd: [{ id: 1, name: "Yak1", age: 2 }],
-      milkStock: 100,
-      woolStock: 50,
-    },
-    order: {
-      orderHistory: [
-        { orderStatus: "pending", milk: 10, wool: 5, milkCost: 20, woolCost: 15, totalCost: 35, date: "2025-01-20" },
-      ],
-    },
-    theme: {
-      darkMode: false,
-    },
+  order: {
+    orderHistory: [
+      { orderStatus: "pending", milk: 10, wool: 5, milkCost: 20, woolCost: 15, totalCost: 35, date: "2025-01-20" },
+    ],
   },
-});
+  theme: {
+    darkMode: false,
+  },
+}
 
 describe("StockDashboard Component", () => {
-  it("should render StockDashboard with data", async () => {
-    render(
-      <Provider store={mockStore}>
+  const renderWithStore = async (initialState) => {
+    const store = configureStore({
+      reducer: {
+        order: orderReducer,
+        stock: stockReducer,
+        theme: themeReducer,
+      },
+      preloadedState: initialState,
+    });
+
+    const { container } = await render(
+      <Provider store={store}>
         <StockDashboard />
       </Provider>
     );
 
-    expect(screen.getByText("Overall Revenue Comparison By Orders")).toBeInTheDocument();
-    expect(screen.getByText("Milk Production Comparison (Liters)")).toBeInTheDocument();
-    expect(screen.getByText("Wool Production Comparison (Skins)")).toBeInTheDocument();
-    expect(screen.getByText("Overall Milk and Wool Stock Levels")).toBeInTheDocument();
-    expect(screen.queryByText(/No Orders Placed Yet/i)).not.toBeInTheDocument();
+    return { store, container };
+  };
+
+  it("should render StockDashboard with data", async () => {
+    await renderWithStore(initialState);
+
+    const revenueChart = await screen.findByText("Overall Revenue Comparison By Orders")
+    const milkProductionPieChart = await screen.findByText("Milk Production Comparison (Liters)")
+    const woolProductionPieChart = await screen.findByText("Wool Production Comparison (Skins)")
+    const noOrderPlacedYet = await screen.queryByText(/No Orders Placed Yet/i)
+
+    expect(revenueChart).toBeInTheDocument();
+    expect(milkProductionPieChart).toBeInTheDocument();
+    expect(woolProductionPieChart).toBeInTheDocument();
+    expect(noOrderPlacedYet).not.toBeInTheDocument();
   });
 
   it("should filter herd based on selected Yak", async () => {
-    render(
-      <Provider store={mockStore}>
-        <StockDashboard />
-      </Provider>
-    );
+    await renderWithStore(initialState);
   
     const filter = screen.getByLabelText(/Filter by Yak/i);
     userEvent.click(filter);
@@ -82,67 +91,45 @@ describe("StockDashboard Component", () => {
   });
 
   it("should render 'No herd data available' if herd is empty", async () => {
-    const emptyStore = configureStore({
-      reducer: {
-        stock: stockReducer,
-        order: orderReducer,
-        theme: themeReducer,
+    const emptyHerdState = {
+      stock: {
+        herd: [],
+        milkStock: 100,
+        woolStock: 50,
       },
-      preloadedState: {
-        stock: {
-          herd: [],
-          milkStock: 100,
-          woolStock: 50,
-        },
-        order: {
-          orderHistory: [
-            { orderStatus: "pending", milk: 10, wool: 5, milkCost: 20, woolCost: 15, totalCost: 35, date: "2025-01-20" },
-          ],
-        },
-        theme: {
-          darkMode: false,
-        },
+      order: {
+        orderHistory: [
+          { orderStatus: "pending", milk: 10, wool: 5, milkCost: 20, woolCost: 15, totalCost: 35, date: "2025-01-20" },
+        ],
       },
-    });
+      theme: {
+        darkMode: false,
+      },
+    }
 
-    render(
-      <Provider store={emptyStore}>
-        <StockDashboard />
-      </Provider>
-    );
+    await renderWithStore(emptyHerdState);
 
     expect(screen.getByText(/No herd data available/i)).toBeInTheDocument();
   });
 
   it("should toggle dark mode class", async () => {
-    const darkModeStore = configureStore({
-      reducer: {
-        stock: stockReducer,
-        order: orderReducer,
-        theme: themeReducer,
+    const darkModeState = {
+      stock: {
+        herd: [{ id: 1, name: "Yak1", age: 2 }],
+        milkStock: 100,
+        woolStock: 50,
       },
-      preloadedState: {
-        stock: {
-          herd: [{ id: 1, name: "Yak1", age: 2 }],
-          milkStock: 100,
-          woolStock: 50,
-        },
-        order: {
-          orderHistory: [
-            { orderStatus: "pending", milk: 10, wool: 5, milkCost: 20, woolCost: 15, totalCost: 35, date: "2025-01-20" },
-          ],
-        },
-        theme: {
-          darkMode: true,
-        },
+      order: {
+        orderHistory: [
+          { orderStatus: "pending", milk: 10, wool: 5, milkCost: 20, woolCost: 15, totalCost: 35, date: "2025-01-20" },
+        ],
       },
-    });
+      theme: {
+        darkMode: true,
+      },
+    }
 
-    const { container } = render(
-      <Provider store={darkModeStore}>
-        <StockDashboard />
-      </Provider>
-    );
+    const { container }  = await renderWithStore(darkModeState);
 
     expect(container.firstChild).toHaveClass("dark");
   });

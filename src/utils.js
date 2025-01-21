@@ -1,6 +1,9 @@
 const MIN_SHAVE_DAY = 100;
 const LIFESPAN_IN_DAYS = 1000;
 
+// export const API_URL = "http://localhost:5000";
+export const API_URL = "https://yakshop-db.onrender.com";
+
 export const calculateOverallMilkProductionPerYak = (ageInDays) => {
   let overAllMilkProductionByYak = 0
   for (let minAge = 1; minAge <= ageInDays; minAge++) {

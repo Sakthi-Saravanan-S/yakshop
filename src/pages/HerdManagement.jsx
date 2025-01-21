@@ -34,8 +34,8 @@ const HerdManagement = () => {
       id: index + 1,
       name: yak.name,
       age: `${Math.floor(ageInDays / 100)} Years, ${ageInDays % 100} Days`,
-      milkProductionPerDay: `${calculateMilkProductionPerDay(ageInDays).toFixed(2)} L`,
-      totalMilkProduction: `${calculateOverallMilkProductionPerYak(ageInDays).toFixed(2)} L`,
+      milkProductionPerDay: `${calculateMilkProductionPerDay(ageInDays).toFixed(2)}L`,
+      totalMilkProduction: `${calculateOverallMilkProductionPerYak(ageInDays).toFixed(2)}L`,
       shaveFrequency: `${calculateShaveFrequency(ageInDays)} Day/Shave`,
       totalWoolProduction: calculateWoolStock(ageInDays),
     };

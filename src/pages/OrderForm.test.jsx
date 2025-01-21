@@ -3,11 +3,13 @@ import { render, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import userEvent from "@testing-library/user-event";
+import axios from 'axios'; 
 import orderReducer from "../store/orderSlice";
 import stockReducer from "../store/stockSlice";
 import themeReducer from "../store/themeSlice";
 import OrderForm from "./OrderForm";
 
+jest.mock('axios');
 jest.mock("./OrderForm.scss", () => ({}));
 jest.mock("../components/CustomTable", () => {
   return jest.fn(() => (
@@ -44,7 +46,7 @@ describe("OrderForm", () => {
 
     renderWithStore(initialState);
 
-
+    axios.post.mockResolvedValueOnce({ data: {}});
     await userEvent.type(screen.getByLabelText(/Milk \(liters\)/i), "100");
     await userEvent.type(screen.getByLabelText(/Wool \(skins\)/i), "50");
     await userEvent.click(screen.getByRole("button", { name: /place order/i }));

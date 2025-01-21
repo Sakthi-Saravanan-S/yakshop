@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { fetchHerd, fetchStock, placeOrder, fetchOrderHistory } from './yakApi';
+import { API_URL } from '../utils'
 
 jest.mock('axios');
 
@@ -24,7 +25,7 @@ describe('yakApi', () => {
 
       const result = await fetchHerd();
       expect(result).toEqual(mockData.herd);
-      expect(axios.get).toHaveBeenCalledWith('http://localhost:5000/herd');
+      expect(axios.get).toHaveBeenCalledWith(`${API_URL}/herd`);
     });
 
     it('should throw an error if fetching herd data fails', async () => {
@@ -40,7 +41,7 @@ describe('yakApi', () => {
 
       const result = await fetchStock();
       expect(result).toEqual(mockData.stock);
-      expect(axios.get).toHaveBeenCalledWith('http://localhost:5000/stock');
+      expect(axios.get).toHaveBeenCalledWith(`${API_URL}/stock`);
     });
 
     it('should throw an error if fetching stock data fails', async () => {
@@ -76,7 +77,7 @@ describe('yakApi', () => {
       );
 
       expect(result).toEqual(mockData.orderResponse);
-      expect(axios.post).toHaveBeenCalledWith('http://localhost:5000/orders', orderPayload);
+      expect(axios.post).toHaveBeenCalledWith(`${API_URL}/orders`, orderPayload);
     });
 
     it('should throw an error if placing an order fails', async () => {
@@ -94,7 +95,7 @@ describe('yakApi', () => {
 
       const result = await fetchOrderHistory();
       expect(result).toEqual(mockData.orderHistory);
-      expect(axios.get).toHaveBeenCalledWith('http://localhost:5000/orders');
+      expect(axios.get).toHaveBeenCalledWith(`${API_URL}/orders`);
     });
 
     it('should throw an error if fetching order history fails', async () => {
