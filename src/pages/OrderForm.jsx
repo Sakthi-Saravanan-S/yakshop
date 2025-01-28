@@ -25,6 +25,7 @@ const OrderForm = () => {
   const stock = useSelector((state) => state.stock);
   const orderHistory = useSelector((state) => state.order?.orderHistory || []);
   const darkMode = useSelector((state) => state.theme.darkMode);
+  const DISCOUNT_PERCENTAGE = 10;
 
   const [formState, setFormState] = useState({
     milkAmount: "",
@@ -34,6 +35,8 @@ const OrderForm = () => {
     partialMessage: "",
     milkCost: 0,
     woolCost: 0,
+    subTotal: 0,
+    discountAmount: 0,
     totalCost: 0,
   });
 
@@ -53,11 +56,14 @@ const OrderForm = () => {
     const woolCost = woolAmount
       ? parseInt(woolAmount, 10) * WOOL_COST_PER_SKIN
       : 0;
+    const discountAmount = (milkCost + woolCost) * (DISCOUNT_PERCENTAGE / 100);
     setFormState((prevState) => ({
       ...prevState,
       milkCost,
       woolCost,
-      totalCost: milkCost + woolCost,
+      subTotal: milkCost + woolCost,
+      discountAmount,
+      totalCost: milkCost + woolCost - discountAmount,
     }));
   }, [formState.milkAmount, formState.woolAmount]);
 
@@ -82,10 +88,10 @@ const OrderForm = () => {
     }
 
     if (
-      (milkAmount && (isNaN(milkAmountNum) || milkAmountNum < 0)) ||
-      (woolAmount && (isNaN(woolAmountNum) || woolAmountNum < 0))
+      (milkAmount && (isNaN(milkAmountNum) || milkAmountNum <= 0)) ||
+      (woolAmount && (isNaN(woolAmountNum) || woolAmountNum <= 0))
     ) {
-      return "Please enter valid positive numbers for milk and wool.";
+      return "Please enter valid numbers for milk and wool.";
     }
 
     const milkAvailable = stock.milkStock;
@@ -116,13 +122,16 @@ const OrderForm = () => {
 
     const milkCost = milkAmountNum * MILK_COST_PER_LITER;
     const woolCost = woolAmountNum * WOOL_COST_PER_SKIN;
+    const discountAmount = (milkCost + woolCost) * (DISCOUNT_PERCENTAGE / 100);
 
     const order = {
       milk: Math.min(milkAmountNum, stock.milkStock),
       wool: Math.min(woolAmountNum, stock.woolStock),
       milkCost,
       woolCost,
-      totalCost: milkCost + woolCost,
+      subTotal: milkCost + woolCost,
+      discountAmount,
+      totalCost: milkCost + woolCost - discountAmount,
       date: new Date().toISOString(),
       id: Math.floor(100000 + Math.random() * 900000),
       orderStatus: "pending",
@@ -170,6 +179,8 @@ const OrderForm = () => {
     error,
     successMessage,
     partialMessage,
+    subTotal,
+    discountAmount,
     totalCost,
     milkCost,
     woolCost,
@@ -198,13 +209,20 @@ const OrderForm = () => {
               value={milkAmount}
               onChange={(e) => handleInputChange(e, "milkAmount")}
               margin="normal"
-              error={!!error && woolAmount === "" && milkAmount === ""}
-              helperText={
-                error && woolAmount === "" && milkAmount === ""
-                  ? "Milk amount is required"
-                  : ""
+              error={
+                !!error &&
+                ((woolAmount === "" && milkAmount === "") || milkAmount === "0")
               }
-              InputProps={{ inputProps: { max: 1000 } }}
+              helperText={
+                error &&
+                ((woolAmount === "" && milkAmount === ""
+                  ? "Milk amount is required"
+                  : "") ||
+                  (milkAmount === "0"
+                    ? "Please enter valid number for milk"
+                    : ""))
+              }
+              InputProps={{ inputProps: { min:1, max: 1000 } }}
             />
             <div className="info-icon-container">
               <Tooltip title="Enter the amount of milk you want to order.">
@@ -229,13 +247,20 @@ const OrderForm = () => {
               value={woolAmount}
               onChange={(e) => handleInputChange(e, "woolAmount")}
               margin="normal"
-              error={!!error && woolAmount === "" && milkAmount === ""}
-              helperText={
-                error && woolAmount === "" && milkAmount === ""
-                  ? "Wool amount is required"
-                  : ""
+              error={
+                !!error &&
+                ((woolAmount === "" && milkAmount === "") || woolAmount === "0")
               }
-              InputProps={{ inputProps: { max: 1000 } }}
+              helperText={
+                error &&
+                ((woolAmount === "" && milkAmount === ""
+                  ? "Wool amount is required"
+                  : "") ||
+                  (woolAmount === "0"
+                    ? "Please enter valid number for milk"
+                    : ""))
+              }
+              InputProps={{ inputProps: { min:1, max: 1000 } }}
             />
             <div className="info-icon-container">
               <Tooltip title="Enter the amount of wool you want to order.">
@@ -269,6 +294,33 @@ const OrderForm = () => {
                 <Typography variant="p" sx={{ marginTop: 1 }}>
                   <FaRupeeSign />
                   {woolCost}
+                </Typography>
+              </div>
+              <hr />
+              <div className="total-cost">
+                <Typography variant="p" sx={{ marginTop: 1 }}>
+                  Sub Total
+                </Typography>
+                <Typography variant="p" sx={{ marginTop: 1 }}>
+                  <FaRupeeSign />
+                  {subTotal}
+                </Typography>
+              </div>
+              <div className="discount">
+                <Typography variant="p" sx={{ marginTop: 1 }}>
+                  Discount Percentage
+                </Typography>
+                <Typography variant="p" sx={{ marginTop: 1 }}>
+                  {DISCOUNT_PERCENTAGE}%
+                </Typography>
+              </div>
+              <div className="discount">
+                <Typography variant="p" sx={{ marginTop: 1 }}>
+                  Discount Amount
+                </Typography>
+                <Typography variant="p" sx={{ marginTop: 1 }}>
+                  <FaRupeeSign />
+                  {discountAmount}
                 </Typography>
               </div>
               <hr />
