@@ -75,7 +75,7 @@ src/
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://gitlab.com/Sakthi_SS/yakshop.git
+   git clone https://github.com/Sakthi-Saravanan-S/yakshop.git
    cd yakshop
    ```
 
